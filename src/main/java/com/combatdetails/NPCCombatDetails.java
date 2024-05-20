@@ -1,6 +1,7 @@
 package com.combatdetails;
 
 import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 public class NPCCombatDetails {
@@ -8,6 +9,7 @@ public class NPCCombatDetails {
     private int redHitsplatsTaken;
     private int damageTaken;
     private int timeInCombat;
+    @Setter
     private int resetTimer;
 
     public NPCCombatDetails(int _resetTimer){
@@ -16,10 +18,6 @@ public class NPCCombatDetails {
         damageTaken = 0;
         timeInCombat = 0;
         resetTimer = _resetTimer;
-    }
-
-    public void setResetTimer(int t){
-        resetTimer = t;
     }
 
     public void tickTimer(){

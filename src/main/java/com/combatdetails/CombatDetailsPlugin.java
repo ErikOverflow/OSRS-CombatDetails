@@ -2,6 +2,8 @@ package com.combatdetails;
 
 import com.google.inject.Provides;
 import javax.inject.Inject;
+
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.runelite.api.*;
 import net.runelite.api.events.*;
@@ -10,8 +12,12 @@ import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
+import net.runelite.client.ui.overlay.OverlayManager;
 
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+
 
 @Slf4j
 @PluginDescriptor(
@@ -20,17 +26,19 @@ import java.util.HashMap;
 public class CombatDetailsPlugin extends Plugin
 {
 	//Number of grace ticks for an opponent to be given before removing them as an opponent
-	private final int NPC_DETAILS_RESET_TIME = 20;
-	private final int PLAYER_DETAILS_RESET_TIME = 100;
+	public static final int MILLISECONDS_PER_TICK = 600;
 
-	private PlayerCombatDetails playerCombatDetails = new PlayerCombatDetails(PLAYER_DETAILS_RESET_TIME);
+	@Getter
+	private PlayerCombatDetails playerCombatDetails = new PlayerCombatDetails();
 	private Actor player;
 	private int totalPlayerAttacks;
 	private int totalPlayerRedHitsDealt;
 	private int totalPlayerDefenses;
 	private int totalPlayerRedHitsTaken;
 	private int killsPerHour;
+	private int outOfCombatTicks = 20;
 	private final HashMap<Actor, NPCCombatDetails> combatOpponents = new HashMap<>();
+	Iterator<Map.Entry<Actor, NPCCombatDetails>> iterator;
 
 	@Inject
 	private Client client;
@@ -38,20 +46,35 @@ public class CombatDetailsPlugin extends Plugin
 	@Inject
 	private CombatDetailsConfig config;
 
+	@Inject
+	private OverlayManager overlayManager;
+
+	@Inject
+	private CombatDetailsOverlay combatDetailsOverlay;
+
+	@Inject
+	private OpponentDetailsOverlay opponentDetailsOverlay;
+
 	@Override
 	protected void startUp() throws Exception
 	{
 		//Started
+		overlayManager.add(combatDetailsOverlay);
+		overlayManager.add(opponentDetailsOverlay);
+		outOfCombatTicks = config.outOfCombatTicks();
 	}
 
 	@Subscribe
 	protected void onConfigChanged(ConfigChanged configChanged){
-
+		combatDetailsOverlay.buildOverlays();
+		opponentDetailsOverlay.buildOverlays();
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
+		overlayManager.remove(combatDetailsOverlay);
+		overlayManager.remove(opponentDetailsOverlay);
 		//Stopped
 	}
 
@@ -67,32 +90,37 @@ public class CombatDetailsPlugin extends Plugin
 
 	@Subscribe
 	public void onActorDeath(ActorDeath actorDeath){
+		playerCombatDetails.enemyKilled();
 		combatOpponents.remove(actorDeath.getActor());
 	}
 
 	@Subscribe
 	public void onGameTick(GameTick gameTick){
-		playerCombatDetails.tickTimer();
+		iterator = combatOpponents.entrySet().iterator();
+		if(playerCombatDetails.getInCombat()){
+			playerCombatDetails.tickTimer();
+		}
 		//For testing. puts the interaction time above the opponent every tick
-		combatOpponents.forEach(((actor, combatDetails) -> {
+		while(iterator.hasNext()){
+			playerCombatDetails.setResetTimer(outOfCombatTicks);
+			Map.Entry<Actor, NPCCombatDetails> entry = iterator.next();
+			Actor actor = entry.getKey();
+			NPCCombatDetails combatDetails = entry.getValue();
+			combatDetails.tickTimer();
 			if(combatDetails.getResetTimer() <= 0){
 				//check if still interacting
 				if(actor.getInteracting() == player || player.getInteracting() == actor){
-					combatDetails.setResetTimer(NPC_DETAILS_RESET_TIME);
-					playerCombatDetails.setResetTimer(PLAYER_DETAILS_RESET_TIME);
+					//Reset the timer if they're still in combat/interacting
+					combatDetails.setResetTimer(outOfCombatTicks);
 				} else{
+					//If not still interacting, remove from the list
 					combatOpponents.remove(actor);
 					return;
 				}
 			}
-			//Take the following actions AFTER we may have removed the opponent, so we aren't trying to apply an overhead
-			//text to a non-existent actor next frame.
-			combatDetails.tickTimer();
-			actor.setOverheadText(String.valueOf(combatDetails.getResetTimer()));
-			log.info("Details. Player Hits Taken: " + String.valueOf(playerCombatDetails.getHitsTaken()));
-		}));
+		}
 		if(combatOpponents.isEmpty() && playerCombatDetails.getResetTimer() <= 0){
-			//stop tracking. Player is now out of combat
+			playerCombatDetails.resetPlayerCombatDetails();
 		}
 	}
 
@@ -101,12 +129,11 @@ public class CombatDetailsPlugin extends Plugin
 		Actor source = interactingChanged.getSource();
 		Actor target = interactingChanged.getTarget();
 		if(source == player && target != null){
-            combatOpponents.computeIfAbsent(target, key -> new NPCCombatDetails(NPC_DETAILS_RESET_TIME));
+            combatOpponents.computeIfAbsent(target, key -> new NPCCombatDetails(outOfCombatTicks));
 		}
 		else if(target == player){
-			combatOpponents.computeIfAbsent(source, key -> new NPCCombatDetails(NPC_DETAILS_RESET_TIME));
+			combatOpponents.computeIfAbsent(source, key -> new NPCCombatDetails(outOfCombatTicks));
 		} else {
-			log.info("removing combatant");
             combatOpponents.remove(source);
 		}
 
