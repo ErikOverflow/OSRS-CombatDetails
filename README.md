@@ -1,6 +1,7 @@
 # CombatDetails
 A plugin that provides information detailing your current combat.
 
+![](ExampleScreenshot.png)
 These details can be configured to include:
 - Player details
   - Attacks and accuracy %
