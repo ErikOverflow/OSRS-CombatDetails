@@ -73,6 +73,14 @@ public class PlayerDetailsOverlay extends OverlayPanel{
 
     @Override
     public Dimension render(Graphics2D graphics){
+        //If the config does not contain any player data, do not display
+        if(!config.playerAccuracy() &&
+                !config.playerDamage() &&
+                !config.playerAttacks() &&
+                !config.playerKillsPerHour() &&
+                !config.timeInCombat()){
+            return null;
+        }
         //If not in combat at all
         if(!playerCombatDetails.getInCombat()){
             return null;

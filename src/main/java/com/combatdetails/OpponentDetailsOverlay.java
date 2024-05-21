@@ -56,6 +56,12 @@ public class OpponentDetailsOverlay extends OverlayPanel{
 
     @Override
     public Dimension render(Graphics2D graphics){
+        //if the config does not allow any opponent data, do not display
+        if(!config.opponentAccuracy() &&
+                !config.opponentDamage() &&
+                !config.opponentAttacks()){
+            return null;
+        }
         //If not in combat at all
         if(!playerCombatDetails.getInCombat()){
             return null;
