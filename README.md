@@ -2,13 +2,11 @@
 A plugin that provides information detailing your current combat.
 
 These details can be configured to include:
-- Time in combat
 - Player details
-  - Kills per hour
-  - Number of attacks
-  - Accuracy %
+  - Attacks and accuracy %
   - Total Damage dealt
+  - Kills per hour
+  - Time in combat
 - Opponent details
-  - Number of attacks
-  - Accuracy %
+  - Attacks and accuracy %
   - Total Damage dealt
