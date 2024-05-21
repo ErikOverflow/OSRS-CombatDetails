@@ -10,6 +10,7 @@ import net.runelite.api.events.*;
 import net.runelite.client.config.ConfigManager;
 import net.runelite.client.eventbus.Subscribe;
 import net.runelite.client.events.ConfigChanged;
+import net.runelite.client.game.NPCManager;
 import net.runelite.client.plugins.Plugin;
 import net.runelite.client.plugins.PluginDescriptor;
 import net.runelite.client.ui.overlay.OverlayManager;
@@ -30,6 +31,7 @@ public class CombatDetailsPlugin extends Plugin
 
 	@Getter
 	private PlayerCombatDetails playerCombatDetails = new PlayerCombatDetails();
+	@Getter
 	private Actor player;
 	private int totalPlayerAttacks;
 	private int totalPlayerRedHitsDealt;
@@ -50,7 +52,7 @@ public class CombatDetailsPlugin extends Plugin
 	private OverlayManager overlayManager;
 
 	@Inject
-	private CombatDetailsOverlay combatDetailsOverlay;
+	private PlayerDetailsOverlay playerDetailsOverlay;
 
 	@Inject
 	private OpponentDetailsOverlay opponentDetailsOverlay;
@@ -59,21 +61,22 @@ public class CombatDetailsPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		//Started
-		overlayManager.add(combatDetailsOverlay);
+		overlayManager.add(playerDetailsOverlay);
 		overlayManager.add(opponentDetailsOverlay);
 		outOfCombatTicks = config.outOfCombatTicks();
 	}
 
 	@Subscribe
 	protected void onConfigChanged(ConfigChanged configChanged){
-		combatDetailsOverlay.buildOverlays();
+		playerDetailsOverlay.buildOverlays();
 		opponentDetailsOverlay.buildOverlays();
+
 	}
 
 	@Override
 	protected void shutDown() throws Exception
 	{
-		overlayManager.remove(combatDetailsOverlay);
+		overlayManager.remove(playerDetailsOverlay);
 		overlayManager.remove(opponentDetailsOverlay);
 		//Stopped
 	}
@@ -147,7 +150,7 @@ public class CombatDetailsPlugin extends Plugin
 			//if the player was hit, add that damage to the player's details
 			playerCombatDetails.takeDamage(hitsplatApplied.getHitsplat().getAmount());
 
-		}else if(combatOpponents.containsKey(hitsplatApplied.getActor())){
+		}else if(hitsplatApplied.getHitsplat().isMine() && combatOpponents.containsKey(hitsplatApplied.getActor())){
 			//If the opponent was hit, add that to the opponent's details.
 			NPCCombatDetails npcCombatDetails = combatOpponents.get(hitsplatApplied.getActor());
 			npcCombatDetails.takeDamage(hitsplatApplied.getHitsplat().getAmount());

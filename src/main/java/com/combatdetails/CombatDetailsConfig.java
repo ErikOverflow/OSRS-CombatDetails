@@ -14,7 +14,7 @@ public interface CombatDetailsConfig extends Config {
     @ConfigItem(
             keyName = "outOfCombatTicks",
             name = "Out Of Combat Time",
-            description = "The number of ticks to wait before considering combat over.",
+            description = "The number of ticks to wait before resetting.",
             position = 0
     )
     default int outOfCombatTicks() { return 20; }
@@ -26,34 +26,16 @@ public interface CombatDetailsConfig extends Config {
     )
     String playerDetails = "playerDetails";
 
+
+
     @ConfigItem(
-            keyName = "timeInCombat",
-            name = "Show time in combat",
-            description = "Configures whether or not to display time in combat",
+            keyName = "playerAttacks",
+            name = "Display Player Attacks",
+            description = "Display the attacks a player makes and how many hit.",
             position = 1,
             section = playerDetails
     )
-    default boolean timeInCombat() { return false; }
-
-    @ConfigItem(
-            keyName = "playerHitCount",
-            name = "Display Player Hit Count",
-            description = "Display the total number of attacks the player attempts. Multi-target attacks count as multiple hits",
-            position = 0,
-            section = playerDetails
-    )
-    default boolean playerHitCount() {
-        return false;
-    }
-
-    @ConfigItem(
-            keyName = "playerDamage",
-            name = "Display Player Damage Amount",
-            description = "Display the total amount of damage a player has done in combat",
-            position = 0,
-            section = playerDetails
-    )
-    default boolean playerDamage() {
+    default boolean playerAttacks() {
         return true;
     }
 
@@ -61,7 +43,7 @@ public interface CombatDetailsConfig extends Config {
             keyName = "playerAccuracy",
             name = "Display Player Accuracy",
             description = "Display the accuracy of the player's attacks on monsters. A value over 1.0 means that a player succesfully hits multiple times per attack (multi-target attacks, cannon, etc)",
-            position = 0,
+            position = 2,
             section = playerDetails
     )
     default boolean playerAccuracy() {
@@ -69,10 +51,21 @@ public interface CombatDetailsConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "playerDamage",
+            name = "Display Player Damage Amount",
+            description = "Display the total amount of damage a player has done in combat",
+            position = 3,
+            section = playerDetails
+    )
+    default boolean playerDamage() {
+        return true;
+    }
+
+    @ConfigItem(
             keyName = "playerKillsPerHour",
             name = "Display Kills Per Hour",
             description = "Display the total number of kills per hour a player achieves",
-            position = 0,
+            position = 4,
             section = playerDetails
     )
     default boolean playerKillsPerHour() {
@@ -80,14 +73,23 @@ public interface CombatDetailsConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "playerTextColor",
-            name = "Text Color",
-            description = "The text color for the player details",
+            keyName = "timeInCombat",
+            name = "Show time in combat",
+            description = "Configures whether or not to display time in combat",
             position = 5,
             section = playerDetails
     )
+    default boolean timeInCombat() { return false; }
+
+    @ConfigItem(
+            keyName = "playerTextColor",
+            name = "Text Color",
+            description = "The text color for the player details",
+            position = 6,
+            section = playerDetails
+    )
     default Color playerTextColor() {
-        return Color.BLUE;
+        return new Color(146,171,255);
     }
 
 
@@ -100,32 +102,21 @@ public interface CombatDetailsConfig extends Config {
     String opponentDetails = "opponentDetails";
 
     @ConfigItem(
-            keyName = "opponentHitCount",
-            name = "Display Opponent Hit Count",
-            description = "Display the total number of hits the player receives in combat",
-            position = 0,
+            keyName = "opponentAttacks",
+            name = "Display Opponent Attacks",
+            description = "Display the attacks your opponents make and how many hit.",
+            position = 1,
             section = opponentDetails
     )
-    default boolean opponentHitCount() {
-        return false;
-    }
-
-    @ConfigItem(
-            keyName = "opponentDamage",
-            name = "Display Opponent Damage Amount",
-            description = "Display the total amount of damage a player has received in combat",
-            position = 0,
-            section = opponentDetails
-    )
-    default boolean opponentDamage() {
+    default boolean opponentAttacks() {
         return true;
     }
 
     @ConfigItem(
             keyName = "opponentAccuracy",
             name = "Display Opponent Accuracy",
-            description = "Display the accuracy of the opponent's hits on the player.",
-            position = 0,
+            description = "Display the accuracy of the opponent's hits.",
+            position = 2,
             section = opponentDetails
     )
     default boolean opponentAccuracy() {
@@ -133,13 +124,25 @@ public interface CombatDetailsConfig extends Config {
     }
 
     @ConfigItem(
+            keyName = "opponentDamage",
+            name = "Display Opponent Damage Amount",
+            description = "Display the total amount of damage a player has received in combat",
+            position = 3,
+            section = opponentDetails
+    )
+    default boolean opponentDamage() {
+        return true;
+    }
+
+
+    @ConfigItem(
             keyName = "opponentTextColor",
             name = "Text Color",
             description = "The text color for the opponent details",
-            position = 5,
+            position = 4,
             section = opponentDetails
     )
     default Color opponentTextColor() {
-        return Color.RED;
+        return new Color(255,136,136);
     }
 }

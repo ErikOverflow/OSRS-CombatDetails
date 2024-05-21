@@ -1,10 +1,8 @@
 package com.combatdetails;
 
-import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayPanel;
+import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.ComponentConstants;
-import net.runelite.client.ui.overlay.components.LineComponent;
-import net.runelite.client.ui.overlay.components.PanelComponent;
 import net.runelite.client.ui.overlay.components.TitleComponent;
 
 import javax.inject.Inject;
@@ -17,9 +15,8 @@ public class OpponentDetailsOverlay extends OverlayPanel{
     private final CombatDetailsConfig config;
     private final PlayerCombatDetails playerCombatDetails;
 
-    private final LineComponent opponentHits = LineComponent.builder().build();
-    private final LineComponent opponentAccuracy = LineComponent.builder().build();
-    private final LineComponent opponentDamage = LineComponent.builder().build();
+    private final TitleComponent opponentAtks = TitleComponent.builder().build();
+    private final TitleComponent opponentDamage = TitleComponent.builder().build();
     private final TitleComponent opponentTitle = TitleComponent.builder().build();
 
     @Inject
@@ -34,35 +31,27 @@ public class OpponentDetailsOverlay extends OverlayPanel{
     public void buildOverlays(){
         panelComponent.getChildren().clear();
         panelComponent.setBorder(new Rectangle(BORDER_SIZE,BORDER_SIZE,BORDER_SIZE,BORDER_SIZE));
-        panelComponent.setPreferredSize(new Dimension(ComponentConstants.STANDARD_WIDTH, 0));
-        panelComponent.setPreferredLocation(new Point(0,0));
+        panelComponent.setGap(new Point(0,2));
+        setPreferredPosition(OverlayPosition.ABOVE_CHATBOX_RIGHT);
+        setSnappable(true);
+        setResizable(true);
 
-        opponentTitle.setText("Opponent details");
-        opponentHits.setLeft("Atks:");
-        opponentHits.setLeftColor(Color.WHITE);
-        opponentHits.setRightColor(config.opponentTextColor());
-        opponentHits.setRight("~");
-        opponentDamage.setLeft("Dmg:");
-        opponentDamage.setLeftColor(Color.WHITE);
-        opponentDamage.setRight("~");
-        opponentDamage.setRightColor(config.opponentTextColor());
-        opponentAccuracy.setLeft("Acc%:");
-        opponentAccuracy.setLeftColor(Color.WHITE);
-        opponentAccuracy.setRight("~");
-        opponentAccuracy.setRightColor(config.opponentTextColor());
+        opponentTitle.setText("Opponent");
+        opponentAtks.setText("~/~ (~)");
+        opponentAtks.setColor(config.opponentTextColor());
+        opponentDamage.setText("~");
+        opponentDamage.setColor(config.opponentTextColor());
 
 
         if(config.opponentAccuracy() ||
                 config.opponentDamage() ||
-                config.opponentHitCount()){
+                config.opponentAttacks()){
             panelComponent.getChildren().add(opponentTitle);
         }
-        if(config.opponentHitCount())
-            panelComponent.getChildren().add(opponentHits);
+        if(config.opponentAttacks())
+            panelComponent.getChildren().add(opponentAtks);
         if(config.opponentDamage())
             panelComponent.getChildren().add(opponentDamage);
-        if(config.opponentAccuracy())
-            panelComponent.getChildren().add(opponentAccuracy);
     }
 
     @Override
@@ -75,10 +64,18 @@ public class OpponentDetailsOverlay extends OverlayPanel{
         if(playerCombatDetails.getHitsTaken() == 0 && playerCombatDetails.getHitsDone() == 0){
             return null;
         }
-        opponentHits.setRight(Integer.toString(playerCombatDetails.getHitsTaken()));
-        opponentDamage.setRight(Integer.toString(playerCombatDetails.getDamageTaken()));
-        opponentAccuracy.setRight(HIT_PERCENT_FORMAT.format(playerCombatDetails.getOpponentAccuracy()));
 
+        String opponentAttackString = String.format("%d/%d", playerCombatDetails.getRedHitsplatsTaken(), playerCombatDetails.getHitsTaken());
+        if(config.playerAccuracy()){
+            opponentAttackString = String.format("%d/%d (%s)%%", playerCombatDetails.getRedHitsplatsTaken(), playerCombatDetails.getHitsTaken(), HIT_PERCENT_FORMAT.format(playerCombatDetails.getOpponentAccuracy() * 100));
+        }
+        String opponentDamageString = String.format("%d", playerCombatDetails.getDamageTaken());
+        opponentAtks.setText(opponentAttackString);
+        opponentDamage.setText(opponentDamageString);
+
+        final FontMetrics fontMetrics = graphics.getFontMetrics();
+        int panelWidth = Math.max(ComponentConstants.STANDARD_WIDTH/2, fontMetrics.stringWidth(opponentAttackString) + ComponentConstants.STANDARD_BORDER + ComponentConstants.STANDARD_BORDER);
+        panelComponent.setPreferredSize(new Dimension(panelWidth, 0));
         return panelComponent.render(graphics);
     }
 }
