@@ -86,7 +86,7 @@ public class PlayerDetailsOverlay extends OverlayPanel{
             playerAttackString = String.format("%d/%d (%s)%%", playerCombatDetails.getRedHitsplatsDone(), playerCombatDetails.getHitsDone(), HIT_PERCENT_FORMAT.format(playerCombatDetails.getPlayerAccuracy() * 100));
         }
         playerTitle.setText(client.getLocalPlayer().getName());
-        String playerDamageString = String.format("%d", playerCombatDetails.getDamageDealt());
+        String playerDamageString = String.format("Dmg: %d", playerCombatDetails.getDamageDealt());
         String playerKillersPerHourString = String.format("KPH: %s", KPH_FORMAT.format(playerCombatDetails.getKillsPerHour()));
         String combatTimeString = String.format("%dt",playerCombatDetails.getTimeInCombat());
         playerAtks.setText(playerAttackString);

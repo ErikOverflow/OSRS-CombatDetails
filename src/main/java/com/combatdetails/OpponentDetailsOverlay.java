@@ -69,7 +69,7 @@ public class OpponentDetailsOverlay extends OverlayPanel{
         if(config.playerAccuracy()){
             opponentAttackString = String.format("%d/%d (%s)%%", playerCombatDetails.getRedHitsplatsTaken(), playerCombatDetails.getHitsTaken(), HIT_PERCENT_FORMAT.format(playerCombatDetails.getOpponentAccuracy() * 100));
         }
-        String opponentDamageString = String.format("%d", playerCombatDetails.getDamageTaken());
+        String opponentDamageString = String.format("Dmg: %d", playerCombatDetails.getDamageTaken());
         opponentAtks.setText(opponentAttackString);
         opponentDamage.setText(opponentDamageString);
 
