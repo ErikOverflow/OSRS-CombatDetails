@@ -4,7 +4,6 @@ import net.runelite.api.Client;
 import net.runelite.client.ui.overlay.OverlayPanel;
 import net.runelite.client.ui.overlay.OverlayPosition;
 import net.runelite.client.ui.overlay.components.*;
-import net.runelite.client.ui.overlay.components.TextComponent;
 
 import javax.inject.Inject;
 import java.awt.*;
@@ -19,7 +18,7 @@ public class PlayerDetailsOverlay extends OverlayPanel{
     private final PlayerCombatDetails playerCombatDetails;
 
     private final TitleComponent combatTime = TitleComponent.builder().build();
-    private final TitleComponent playerAtks = TitleComponent.builder().build();
+    private final TitleComponent playerAccuracy = TitleComponent.builder().build();
     private final TitleComponent playerDamage = TitleComponent.builder().build();
     private final TitleComponent playerKillsPerHour = TitleComponent.builder().build();
     private final TitleComponent playerTitle = TitleComponent.builder().build();
@@ -44,10 +43,8 @@ public class PlayerDetailsOverlay extends OverlayPanel{
         setResizable(true);
 
         playerTitle.setText("Player");
-        combatTime.setText("~t");
-        combatTime.setColor(config.playerTextColor());
-        playerAtks.setText("~/~ (~)");
-        playerAtks.setColor(config.playerTextColor());
+        playerAccuracy.setText("~");
+        playerAccuracy.setColor(config.playerTextColor());
         playerDamage.setText("~");
         playerDamage.setColor(config.playerTextColor());
         playerKillsPerHour.setText("KPH: ~");
@@ -56,12 +53,11 @@ public class PlayerDetailsOverlay extends OverlayPanel{
 
         if(config.playerAccuracy() ||
                 config.playerDamage() ||
-                config.playerAttacks() ||
                 config.playerKillsPerHour()){
             panelComponent.getChildren().add(playerTitle);
         }
-        if(config.playerAttacks())
-            panelComponent.getChildren().add(playerAtks);
+        if(config.playerAccuracy())
+            panelComponent.getChildren().add(playerAccuracy);
         if(config.playerDamage())
             panelComponent.getChildren().add(playerDamage);
         if(config.playerKillsPerHour())
@@ -73,7 +69,6 @@ public class PlayerDetailsOverlay extends OverlayPanel{
         //If the config does not contain any player data, do not display
         if(!config.playerAccuracy() &&
                 !config.playerDamage() &&
-                !config.playerAttacks() &&
                 !config.playerKillsPerHour()){
             return null;
         }
@@ -85,21 +80,17 @@ public class PlayerDetailsOverlay extends OverlayPanel{
         if(playerCombatDetails.getHitsTaken() == 0 && playerCombatDetails.getHitsDone() == 0){
             return null;
         }
-        String playerAttackString = String.format("%d/%d", playerCombatDetails.getRedHitsplatsDone(), playerCombatDetails.getHitsDone());
-        if(config.playerAccuracy()){
-            playerAttackString = String.format("%d/%d (%s)%%", playerCombatDetails.getRedHitsplatsDone(), playerCombatDetails.getHitsDone(), HIT_PERCENT_FORMAT.format(playerCombatDetails.getPlayerAccuracy() * 100));
-        }
+        String playerAccuracyString = String.format("%s%%", HIT_PERCENT_FORMAT.format(playerCombatDetails.getPlayerAccuracy() * 100));
         playerTitle.setText(client.getLocalPlayer().getName());
         String playerDamageString = String.format("Dmg: %d", playerCombatDetails.getDamageDealt());
         String playerKillersPerHourString = String.format("KPH: %s", KPH_FORMAT.format(playerCombatDetails.getKillsPerHour()));
         String combatTimeString = String.format("%dt",playerCombatDetails.getTimeInCombat());
-        playerAtks.setText(playerAttackString);
+        playerAccuracy.setText(playerAccuracyString);
         playerDamage.setText(playerDamageString);
         playerKillsPerHour.setText(playerKillersPerHourString);
-        combatTime.setText(combatTimeString);
 
         final FontMetrics fontMetrics = graphics.getFontMetrics();
-        int panelWidth = Math.max(ComponentConstants.STANDARD_WIDTH/2, fontMetrics.stringWidth(playerAttackString) + ComponentConstants.STANDARD_BORDER + ComponentConstants.STANDARD_BORDER);
+        int panelWidth = Math.max(ComponentConstants.STANDARD_WIDTH/2, fontMetrics.stringWidth(playerAccuracyString) + ComponentConstants.STANDARD_BORDER + ComponentConstants.STANDARD_BORDER);
         panelWidth = Math.max(panelWidth, fontMetrics.stringWidth("" + client.getLocalPlayer().getName()) + ComponentConstants.STANDARD_BORDER + ComponentConstants.STANDARD_BORDER);
         panelComponent.setPreferredSize(new Dimension(panelWidth, 0));
         return panelComponent.render(graphics);

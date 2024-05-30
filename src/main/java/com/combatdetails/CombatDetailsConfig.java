@@ -26,19 +26,6 @@ public interface CombatDetailsConfig extends Config {
     )
     String playerDetails = "playerDetails";
 
-
-
-    @ConfigItem(
-            keyName = "playerAttacks",
-            name = "Display Player Attacks",
-            description = "Display the attacks a player makes and how many hit.",
-            position = 1,
-            section = playerDetails
-    )
-    default boolean playerAttacks() {
-        return true;
-    }
-
     @ConfigItem(
             keyName = "playerAccuracy",
             name = "Display Player Accuracy",
@@ -91,17 +78,6 @@ public interface CombatDetailsConfig extends Config {
             position = 2
     )
     String opponentDetails = "opponentDetails";
-
-    @ConfigItem(
-            keyName = "opponentAttacks",
-            name = "Display Opponent Attacks",
-            description = "Display the attacks your opponents make and how many hit.",
-            position = 1,
-            section = opponentDetails
-    )
-    default boolean opponentAttacks() {
-        return true;
-    }
 
     @ConfigItem(
             keyName = "opponentAccuracy",

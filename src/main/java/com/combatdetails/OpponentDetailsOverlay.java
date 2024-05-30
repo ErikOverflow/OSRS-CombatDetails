@@ -15,7 +15,7 @@ public class OpponentDetailsOverlay extends OverlayPanel{
     private final CombatDetailsConfig config;
     private final PlayerCombatDetails playerCombatDetails;
 
-    private final TitleComponent opponentAtks = TitleComponent.builder().build();
+    private final TitleComponent opponentAccuracy = TitleComponent.builder().build();
     private final TitleComponent opponentDamage = TitleComponent.builder().build();
     private final TitleComponent opponentTitle = TitleComponent.builder().build();
 
@@ -37,19 +37,18 @@ public class OpponentDetailsOverlay extends OverlayPanel{
         setResizable(true);
 
         opponentTitle.setText("Opponent");
-        opponentAtks.setText("~/~ (~)");
-        opponentAtks.setColor(config.opponentTextColor());
+        opponentAccuracy.setText("~");
+        opponentAccuracy.setColor(config.opponentTextColor());
         opponentDamage.setText("~");
         opponentDamage.setColor(config.opponentTextColor());
 
 
         if(config.opponentAccuracy() ||
-                config.opponentDamage() ||
-                config.opponentAttacks()){
+                config.opponentDamage()){
             panelComponent.getChildren().add(opponentTitle);
         }
-        if(config.opponentAttacks())
-            panelComponent.getChildren().add(opponentAtks);
+        if(config.opponentAccuracy())
+            panelComponent.getChildren().add(opponentAccuracy);
         if(config.opponentDamage())
             panelComponent.getChildren().add(opponentDamage);
     }
@@ -58,8 +57,7 @@ public class OpponentDetailsOverlay extends OverlayPanel{
     public Dimension render(Graphics2D graphics){
         //if the config does not allow any opponent data, do not display
         if(!config.opponentAccuracy() &&
-                !config.opponentDamage() &&
-                !config.opponentAttacks()){
+                !config.opponentDamage()){
             return null;
         }
         //If not in combat at all
@@ -71,12 +69,9 @@ public class OpponentDetailsOverlay extends OverlayPanel{
             return null;
         }
 
-        String opponentAttackString = String.format("%d/%d", playerCombatDetails.getRedHitsplatsTaken(), playerCombatDetails.getHitsTaken());
-        if(config.playerAccuracy()){
-            opponentAttackString = String.format("%d/%d (%s)%%", playerCombatDetails.getRedHitsplatsTaken(), playerCombatDetails.getHitsTaken(), HIT_PERCENT_FORMAT.format(playerCombatDetails.getOpponentAccuracy() * 100));
-        }
+        String opponentAttackString = String.format("%s%%", HIT_PERCENT_FORMAT.format(playerCombatDetails.getOpponentAccuracy() * 100));
         String opponentDamageString = String.format("Dmg: %d", playerCombatDetails.getDamageTaken());
-        opponentAtks.setText(opponentAttackString);
+        opponentAccuracy.setText(opponentAttackString);
         opponentDamage.setText(opponentDamageString);
 
         final FontMetrics fontMetrics = graphics.getFontMetrics();
