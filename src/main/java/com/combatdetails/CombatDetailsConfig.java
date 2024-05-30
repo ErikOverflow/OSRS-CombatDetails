@@ -73,15 +73,6 @@ public interface CombatDetailsConfig extends Config {
     }
 
     @ConfigItem(
-            keyName = "timeInCombat",
-            name = "Show time in combat",
-            description = "Configures whether or not to display time in combat",
-            position = 5,
-            section = playerDetails
-    )
-    default boolean timeInCombat() { return false; }
-
-    @ConfigItem(
             keyName = "playerTextColor",
             name = "Text Color",
             description = "The text color for the player details",

@@ -57,16 +57,13 @@ public class PlayerDetailsOverlay extends OverlayPanel{
         if(config.playerAccuracy() ||
                 config.playerDamage() ||
                 config.playerAttacks() ||
-                config.playerKillsPerHour() ||
-                config.timeInCombat()){
+                config.playerKillsPerHour()){
             panelComponent.getChildren().add(playerTitle);
         }
         if(config.playerAttacks())
             panelComponent.getChildren().add(playerAtks);
         if(config.playerDamage())
             panelComponent.getChildren().add(playerDamage);
-        if(config.timeInCombat())
-            panelComponent.getChildren().add(combatTime);
         if(config.playerKillsPerHour())
             panelComponent.getChildren().add(playerKillsPerHour);
     }
@@ -77,8 +74,7 @@ public class PlayerDetailsOverlay extends OverlayPanel{
         if(!config.playerAccuracy() &&
                 !config.playerDamage() &&
                 !config.playerAttacks() &&
-                !config.playerKillsPerHour() &&
-                !config.timeInCombat()){
+                !config.playerKillsPerHour()){
             return null;
         }
         //If not in combat at all

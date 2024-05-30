@@ -86,7 +86,6 @@ public class CombatDetailsPlugin extends Plugin
 	{
 		if (gameStateChanged.getGameState() == GameState.LOGGED_IN)
 		{
-			client.addChatMessage(ChatMessageType.GAMEMESSAGE, "", "Example says " + config.timeInCombat(), null);
 			player = client.getLocalPlayer();
 		}
 	}
