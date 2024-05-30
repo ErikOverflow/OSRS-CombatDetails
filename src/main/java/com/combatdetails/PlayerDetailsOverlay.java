@@ -17,7 +17,7 @@ public class PlayerDetailsOverlay extends OverlayPanel{
     private final Client client;
     private final PlayerCombatDetails playerCombatDetails;
 
-    private final TitleComponent combatTime = TitleComponent.builder().build();
+    private final TitleComponent playerDps = TitleComponent.builder().build();
     private final TitleComponent playerAccuracy = TitleComponent.builder().build();
     private final TitleComponent playerDamage = TitleComponent.builder().build();
     private final TitleComponent playerKillsPerHour = TitleComponent.builder().build();
@@ -38,14 +38,16 @@ public class PlayerDetailsOverlay extends OverlayPanel{
         panelComponent.setBorder(new Rectangle(BORDER_SIZE,BORDER_SIZE,BORDER_SIZE,BORDER_SIZE));
         panelComponent.setGap(new Point(0,2));
         this.setResizable(true);
-        setPreferredPosition(OverlayPosition.ABOVE_CHATBOX_RIGHT);
+        setPreferredPosition(OverlayPosition.BOTTOM_LEFT);
         setSnappable(true);
         setResizable(true);
 
         playerTitle.setText("Player");
-        playerAccuracy.setText("~");
+        playerDps.setText("DPS: ~");
+        playerDps.setColor(config.playerTextColor());
+        playerAccuracy.setText("Acc: ~");
         playerAccuracy.setColor(config.playerTextColor());
-        playerDamage.setText("~");
+        playerDamage.setText("Dmg: ~");
         playerDamage.setColor(config.playerTextColor());
         playerKillsPerHour.setText("KPH: ~");
         playerKillsPerHour.setColor(config.playerTextColor());
@@ -53,9 +55,12 @@ public class PlayerDetailsOverlay extends OverlayPanel{
 
         if(config.playerAccuracy() ||
                 config.playerDamage() ||
-                config.playerKillsPerHour()){
+                config.playerKillsPerHour() ||
+                config.playerDps()){
             panelComponent.getChildren().add(playerTitle);
         }
+        if(config.playerDps())
+            panelComponent.getChildren().add(playerDps);
         if(config.playerAccuracy())
             panelComponent.getChildren().add(playerAccuracy);
         if(config.playerDamage())
@@ -66,29 +71,36 @@ public class PlayerDetailsOverlay extends OverlayPanel{
 
     @Override
     public Dimension render(Graphics2D graphics){
-        //If the config does not contain any player data, do not display
+        //If the config does display contain any player data, do not display
         if(!config.playerAccuracy() &&
                 !config.playerDamage() &&
-                !config.playerKillsPerHour()){
+                !config.playerKillsPerHour() &&
+                !config.playerDps()){
             return null;
         }
-        //If not in combat at all
+
+        //If not in combat, do not display
         if(!playerCombatDetails.getInCombat()){
             return null;
         }
-        //If the current combat is a "ghost combat" where the player is just interacting with an npc
+
+        //If the current combat is a "ghost combat" where the player is just interacting with an npc but not taking or dealing damage
         if(playerCombatDetails.getHitsTaken() == 0 && playerCombatDetails.getHitsDone() == 0){
             return null;
         }
-        String playerAccuracyString = String.format("%s%%", HIT_PERCENT_FORMAT.format(playerCombatDetails.getPlayerAccuracy() * 100));
-        playerTitle.setText(client.getLocalPlayer().getName());
-        String playerDamageString = String.format("Dmg: %d", playerCombatDetails.getDamageDealt());
+
+        String playerAccuracyString = String.format("ACC: %s%%", HIT_PERCENT_FORMAT.format(playerCombatDetails.getPlayerAccuracy() * 100));
+        String playerDpsString = String.format("DPS: %s",KPH_FORMAT.format(playerCombatDetails.getPlayerDps()));
+        String playerDamageString = String.format("DMG: %d", playerCombatDetails.getDamageDealt());
         String playerKillersPerHourString = String.format("KPH: %s", KPH_FORMAT.format(playerCombatDetails.getKillsPerHour()));
-        String combatTimeString = String.format("%dt",playerCombatDetails.getTimeInCombat());
+
+        playerTitle.setText(client.getLocalPlayer().getName());
         playerAccuracy.setText(playerAccuracyString);
         playerDamage.setText(playerDamageString);
+        playerDps.setText(playerDpsString);
         playerKillsPerHour.setText(playerKillersPerHourString);
 
+        //Resize panel width to be big enough for player name or the accuracy string
         final FontMetrics fontMetrics = graphics.getFontMetrics();
         int panelWidth = Math.max(ComponentConstants.STANDARD_WIDTH/2, fontMetrics.stringWidth(playerAccuracyString) + ComponentConstants.STANDARD_BORDER + ComponentConstants.STANDARD_BORDER);
         panelWidth = Math.max(panelWidth, fontMetrics.stringWidth("" + client.getLocalPlayer().getName()) + ComponentConstants.STANDARD_BORDER + ComponentConstants.STANDARD_BORDER);

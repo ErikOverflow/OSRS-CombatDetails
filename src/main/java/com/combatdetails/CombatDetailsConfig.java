@@ -27,6 +27,17 @@ public interface CombatDetailsConfig extends Config {
     String playerDetails = "playerDetails";
 
     @ConfigItem(
+            keyName = "playerDps",
+            name = "Display Player DPS",
+            description = "Display the player's actual DPS",
+            position = 2,
+            section = playerDetails
+    )
+    default boolean playerDps() {
+        return true;
+    }
+
+    @ConfigItem(
             keyName = "playerAccuracy",
             name = "Display Player Accuracy",
             description = "Display the accuracy of the player's attacks on monsters. A value over 1.0 means that a player succesfully hits multiple times per attack (multi-target attacks, cannon, etc)",
@@ -78,6 +89,17 @@ public interface CombatDetailsConfig extends Config {
             position = 2
     )
     String opponentDetails = "opponentDetails";
+
+    @ConfigItem(
+            keyName = "opponentDps",
+            name = "Display Opponent DPS",
+            description = "Display the actual DPS of the opponent.",
+            position = 1,
+            section = opponentDetails
+    )
+    default boolean opponentDps() {
+        return true;
+    }
 
     @ConfigItem(
             keyName = "opponentAccuracy",

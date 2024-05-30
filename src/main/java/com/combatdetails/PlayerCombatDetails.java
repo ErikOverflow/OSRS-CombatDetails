@@ -76,6 +76,16 @@ public class PlayerCombatDetails {
         return 1000*60*60*totalKills / combatTimeMilliseconds;
     }
 
+    public double getDamageTakenPerSecond(){
+        double combatTimeMilliseconds = (double) timeInCombat*CombatDetailsPlugin.MILLISECONDS_PER_TICK;
+        return 1000 * damageTaken / combatTimeMilliseconds;
+    }
+
+    public double getPlayerDps(){
+        double combatTimeMilliseconds = (double) timeInCombat*CombatDetailsPlugin.MILLISECONDS_PER_TICK;
+        return 1000 * damageDealt / combatTimeMilliseconds;
+    }
+
     public boolean getInCombat() {
         if(resetTimer <= 0){
             return false;
