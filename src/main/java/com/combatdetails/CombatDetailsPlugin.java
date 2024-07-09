@@ -61,6 +61,7 @@ public class CombatDetailsPlugin extends Plugin
 	protected void startUp() throws Exception
 	{
 		//Started
+		playerCombatDetails.resetPlayerCombatDetails();
 		overlayManager.add(playerDetailsOverlay);
 		overlayManager.add(opponentDetailsOverlay);
 		outOfCombatTicks = config.outOfCombatTicks();
@@ -76,6 +77,7 @@ public class CombatDetailsPlugin extends Plugin
 	@Override
 	protected void shutDown() throws Exception
 	{
+		playerCombatDetails.resetPlayerCombatDetails();
 		overlayManager.remove(playerDetailsOverlay);
 		overlayManager.remove(opponentDetailsOverlay);
 		//Stopped
